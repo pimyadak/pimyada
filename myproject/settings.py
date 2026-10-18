@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-l98r1+vzj_fvh)o$_@s-nq@42e4&f+*3!&-c66dcu^vb+3fzsw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['pimyada.onrender.com', '.onrender.com', '127.0.0.1', 'localhost']
 
 
 # Application definition
