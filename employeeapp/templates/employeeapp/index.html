@@ -1,0 +1,15 @@
+<script>
+    console.log("กำลังเริ่มดึงข้อมูล API..."); // เช็กว่าโค้ดทำงานไหม
+
+    fetch('http://127.0.0.1:8000/api/employees/')
+        .then(response => {
+            console.log("สถานะการเชื่อมต่อ:", response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log("ข้อมูลที่ได้จาก API:", data); // ข้อมูลพนักงานจะแสดงตรงนี้
+        })
+        .catch(error => {
+            console.error("เกิดข้อผิดพลาด:", error);
+        });
+</script>

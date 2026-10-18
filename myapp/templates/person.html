@@ -1,0 +1,128 @@
+{% extends 'basetemplate.html' %}
+{% load static %}
+
+{% block content %}
+<h2 style="text-align: center;" class="mb-4">รายชื่อพนักงาน</h2>
+
+<style>
+    /* บังคับให้ row ใช้ flexbox เพื่อให้ card สูงเท่ากันทั้งแถว */
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    /* บังคับรูปภาพให้มีขนาดคงที่ */
+    .card-img-top {
+        width: 100%;
+        height: 200px; 
+        object-fit: cover;
+    }
+</style>
+
+<!-- ส่วนการค้นหา -->
+<div class="text-center mb-4">
+    <form method="GET" action="{% url 'person' %}"> 
+        {% if request.GET.search %}
+        <a href="{% url 'person' %}" class="btn btn-light" style="padding: 5px; margin-right: 5px;">
+            <img src="{% static 'images/back_icon.jpg' %}" style="width: 30px; height: 30px;" alt="ย้อนกลับ">
+        </a>
+        {% endif %}
+
+        <input type="text" name="search" placeholder="ค้นหาชื่อพนักงาน..." value="{{ request.GET.search }}" class="form-control d-inline-block w-auto">
+        <button type="submit" class="btn btn-primary">ค้นหา</button>
+    </form>
+</div>
+
+<!-- ส่วนแสดงผลแบบ Card -->
+<div class="container">
+    <div class="row">
+
+        {% for person in all_employee %}
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 shadow-sm">
+                {% if person.pics %}
+                    <img src="{{ person.pics.url }}" class="card-img-top" alt="พนักงาน" style="height: 300px; width: 100%; object-fit: cover;">
+                {% else %}
+                    <img src="{% static 'images/default-avatar.png' %}" class="card-img-top" alt="ไม่มีรูปภาพ" style="height: 250px; width: 50%; object-fit: cover;">
+                {% endif %}
+
+                    <div class="card-body">
+                        <p class="card-text" style="word-wrap: break-word; font-size: 13px;">
+                            <strong>รหัส :</strong> {{ person.emp_id }}<br>
+                            <strong>ชื่อ :</strong> {{ person.fname }}<br>
+                            <strong>นามสกุล :</strong> {{ person.lname }}<br>
+                            <strong>อายุ :</strong> {{ person.age }} ปี<br>
+                            <strong>ที่อยู่ :</strong> {{ person.address }}<br>
+                            <strong>เพศ :</strong>
+                                {% if person.gender == 'male' %}
+                                    ชาย
+                                {% elif person.gender == 'female' %}
+                                    หญิง
+                                {% else %}
+                                    {{ person.gender }}
+                                {% endif %}<br>
+                            <strong>วันเกิด :</strong> {{ person.birthdate }}<br>
+                            <strong>แผนก :</strong> {{ person.department }}<br>
+                            <strong>เงินเดือน :</strong> {{ person.salary }} บาท
+                        </p>
+                    </div>
+                
+                <!-- แสดงปุ่มจัดการเฉพาะ Admin (is_staff) เท่านั้น พนักงานทั่วไปจะถูกซ่อน -->
+                {% if request.user.is_staff or request.user.is_superuser %}
+                <div class="card-footer bg-white border-0 text-center">
+                    <!-- ปุ่มแก้ไข -->
+                    <a href="{% url 'edit' person.id %}" style="margin-right: 15px;">
+                        <img src="{% static 'images/edit_icon.png' %}" alt="แก้ไข" style="width: 40px; height: 40px;">
+                    </a>
+                    <!-- ปุ่มลบ -->
+                    <a href="#" 
+                       onclick="document.getElementById('confirmDeleteBtn').href='{% url 'delete' person.id %}'" 
+                       data-bs-toggle="modal" 
+                       data-bs-target="#deleteModal">
+                        <img src="{% static 'images/delete_icon.jpg' %}" alt="ลบ" style="width: 25px; height: 25px;">
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+      {% endfor %} 
+       </div>
+</div>
+
+<nav aria-label="Page navigation example" class="mt-4">
+    <ul class="pagination justify-content-center">
+        <!-- ปุ่มก่อนหน้า -->
+        {% if all_employee.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ all_employee.previous_page_number }}&search={{ request.GET.search }}">ก่อนหน้า</a></li>
+        {% endif %}
+
+        <!-- ลูปแสดงเลขหน้า -->
+        {% for num in all_employee.paginator.page_range %}
+            <li class="page-item {% if all_employee.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}&search={{ request.GET.search }}">{{ num }}</a>
+            </li>
+        {% endfor %}
+
+        <!-- ปุ่มถัดไป -->
+        {% if all_employee.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ all_employee.next_page_number }}&search={{ request.GET.search }}">ถัดไป</a></li>
+        {% endif %}
+    </ul>
+</nav>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">ยืนยันการลบ</h5>
+            </div>
+            <div class="modal-body">คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลพนักงานคนนี้?</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <a id="confirmDeleteBtn" href="#" class="btn btn-danger">ตกลง</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

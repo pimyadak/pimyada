@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจัดการพนักงานและคำนวณค่าเดินทาง (API Dashboard)</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome สำหรับไอคอน -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Prompt) -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: #f4f6f9;
+            font-size: 14px;
+        }
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+        .stat-card {
+            border-left: 4px solid #0d6efd;
+            transition: transform 0.2s;
+        }
+        .table thead th {
+            background-color: #1e293b;
+            color: #ffffff;
+            font-weight: 500;
+            border: none;
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+        .table tbody td {
+            padding: 8px 12px;
+            vertical-align: middle;
+            color: #334155;
+        }
+        .table-hover tbody tr:hover {
+            background-color: #f8fafc;
+        }
+        .badge-dept {
+            background-color: #e2e8f0;
+            color: #475569;
+            font-weight: 500;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar หัวข้อระบบ -->
+    <nav class="navbar navbar-dark bg-dark shadow-sm py-2 mb-3">
+        <div class="container-fluid px-4">
+            <span class="navbar-brand mb-0 h1"><i class="fa-solid fa-route text-primary me-2"></i> ระบบจัดการพนักงานและคำนวณค่าเดินทางนอกพื้นที่</span>
+            <div>
+                <a href="/api/employees/?format=json" target="_blank" class="btn btn-outline-light btn-sm py-1 px-2" style="font-size: 12px;">
+                    <i class="fa-solid fa-code me-1"></i> ดูข้อมูล JSON API
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid px-4">
+        
+        <!-- การ์ดสรุปสถิติด้านบนแบบกระชับ (อัปเดตยอดรวมตามประวัติทริปที่บันทึก) -->
+        <div class="row g-2 mb-3">
+            <div class="col-md-3">
+                <div class="card stat-card p-2 bg-white">
+                    <div class="text-muted" style="font-size: 12px;">พนักงานทั้งหมด</div>
+                    <h4 class="fw-bold text-dark m-0" id="totalCount">0 คน</h4>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card p-2 bg-white" style="border-left-color: #198754;">
+                    <div class="text-muted" style="font-size: 12px;">เขตกรุงเทพฯ และปริมณฑล</div>
+                    <h4 class="fw-bold text-success m-0" id="bkkCount">0 คน</h4>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card p-2 bg-white" style="border-left-color: #ffc107;">
+                    <div class="text-muted" style="font-size: 12px;">เขตต่างจังหวัด (นอกพื้นที่)</div>
+                    <h4 class="fw-bold text-warning m-0" id="provincialCount">0 คน</h4>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card p-2 bg-white" style="border-left-color: #dc3545;">
+                    <div class="text-muted" style="font-size: 12px;">ยอดเบิกค่าเดินทางทริปทั้งหมด</div>
+                    <h4 class="fw-bold text-danger m-0" id="totalAllowance">฿0</h4>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card หลักครอบตารางรายชื่อพนักงาน -->
+        <div class="card p-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <h6 class="text-secondary fw-semibold mb-0"><i class="fa-solid fa-table-list me-2 text-primary"></i> รายชื่อพนักงานและพื้นที่รับผิดชอบ</h6>
+                
+                <div class="d-flex gap-2 flex-wrap">
+                    <select id="regionFilter" class="form-select form-select-sm" style="width: 160px;" onchange="searchTable()">
+                        <option value="">ทุกโซนพื้นที่</option>
+                        <option value="กรุงเทพ">กรุงเทพฯ</option>
+                        <option value="ปทุมธานี">ปทุมธานี</option>
+                        <option value="นนทบุรี">นนทบุรี</option>
+                        <option value="จันทบุรี">จันทบุรี</option>
+                        <option value="ตรัง">ตรัง</option>
+                        <option value="อุดร">อุดรธานี</option>
+                        <option value="นครราชสีมา">นครราชสีมา</option>
+                    </select>
+
+                    <div class="input-group input-group-sm" style="width: 250px;">
+                        <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-search text-muted"></i></span>
+                        <input type="text" id="searchInput" class="form-control border-start-0 ps-0" placeholder="ค้นหา รหัส, ชื่อ, จังหวัด..." onkeyup="searchTable()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="employeeTable">
+                    <thead>
+                        <tr>
+                            <th class="rounded-start" style="width: 60px;">ID</th>
+                            <th style="width: 110px;">รหัสพนักงาน</th>
+                            <th>ชื่อ - สกุล</th>
+                            <th style="width: 100px;">แผนก</th>
+                            <th>โซนพื้นที่ / ที่อยู่</th>
+                            <th class="rounded-end text-center" style="width: 140px;">แผนที่</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for emp in employees %}
+                        <tr>
+                            <td><span class="fw-bold text-muted">#{{ emp.id }}</span></td>
+                            <td><span class="badge bg-light text-dark border px-2 py-1">{{ emp.emp_id|default:"-" }}</span></td>
+                            <td><div class="fw-semibold">{{ emp.fname }} {{ emp.lname }}</div></td>
+                            <td><span class="badge-dept">{{ emp.department|default:"ไม่ระบุ" }}</span></td>
+                            <td>
+                                <span class="text-dark address-text" data-address="{{ emp.address }}">{{ emp.address|default:"ไม่ระบุพื้นที่" }}</span>
+                            </td>
+                            <td class="text-center">
+                                {% if emp.address %}
+                                <a href="https://maps.google.com/?q={{ emp.address|urlencode }}" target="_blank" class="btn btn-sm btn-primary py-0 px-2 shadow-sm" style="font-size: 12px;">
+                                    <i class="fa-solid fa-map-location-dot me-1"></i> ดูแผนที่
+                                </a>
+                                {% else %}
+                                <span class="text-muted small">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">ยังไม่มีข้อมูลพนักงานในระบบ</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ================= เครื่องมือคำนวณค่าเดินทาง ================= -->
+        <div class="card p-4 mb-5 border border-primary-subtle">
+            <h5 class="text-primary fw-semibold mb-3"><i class="fa-solid fa-calculator me-2"></i> คำนวณค่าเดินทางนอกพื้นที่ / คำนวณระยะทางอัตโนมัติ</h5>
+            
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">เลือกพนักงาน / ผู้เดินทาง</label>
+                    <select id="calcEmp" class="form-select form-select-sm" onchange="updateEmpAddress()">
+                        {% for emp in employees %}
+                        <option value="{{ emp.fname }} {{ emp.lname }} ({{ emp.emp_id|default:'-' }})" data-address="{{ emp.address|default:'ไม่ระบุที่อยู่' }}">
+                            {{ emp.fname }} {{ emp.lname }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">จุดเริ่มต้น (จากฐานข้อมูลพนักงาน)</label>
+                    <input type="text" id="calcStart" class="form-control form-control-sm bg-light" readonly>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold">จุดปลายทาง (พิมพ์ชื่อจังหวัด/สถานที่)</label>
+                    <input type="text" id="calcEnd" class="form-control form-control-sm" placeholder="เช่น จ.ชลบุรี, จ.เชียงใหม่, ตรัง" oninput="autoCalculateDistance()">
+                </div>
+                <div class="col-md-1">
+                    <label class="form-label small fw-semibold">ระยะทาง (กม.)</label>
+                    <input type="number" id="calcKm" class="form-control form-control-sm" value="50" oninput="calculateTripCost()">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-semibold">เรทค่าน้ำมัน/กม.</label>
+                    <input type="number" id="calcRate" class="form-control form-control-sm" value="4" step="0.5" oninput="calculateTripCost()">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">หมายเหตุ / วัตถุประสงค์การเดินทาง</label>
+                    <input type="text" id="calcNote" class="form-control form-control-sm" placeholder="เช่น ออกตรวจเยี่ยมสาขา นอกพื้นที่">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="button" class="btn btn-outline-primary btn-sm w-100 fw-semibold" onclick="openGoogleDirections()">
+                        <i class="fa-solid fa-route me-1"></i> เช็คเส้นทางใน Maps
+                    </button>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="button" class="btn btn-success btn-sm w-100 fw-semibold" onclick="saveTripRecord()">
+                        <i class="fa-solid fa-floppy-disk me-1"></i> บันทึกรายการเดินทาง
+                    </button>
+                </div>
+            </div>
+
+            <div class="alert alert-light border mt-3 mb-0 d-flex justify-content-between align-items-center">
+                <span>ยอดเงินค่าเดินทางที่ต้องจ่าย: <strong id="previewCost" class="text-danger fs-5">฿200</strong> (คำนวณจาก ระยะทาง × เรทน้ำมัน)</span>
+                <span class="text-muted small">* ระบบเติมระยะทางให้ทันทีเมื่อพิมพ์ชื่อจังหวัด</span>
+            </div>
+        </div>
+
+        <!-- ================= ตารางประวัติบันทึกการเดินทาง ================= -->
+        <div class="card p-4 mb-5 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="text-dark fw-semibold mb-0"><i class="fa-solid fa-file-invoice-dollar me-2 text-success"></i> ประวัติบันทึกการเดินทางและสถานะการจ่ายเงิน</h5>
+                <span class="badge bg-success px-3 py-2">ระบบบันทึกข้อมูล (LocalStorage Active)</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle mb-0" id="historyTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>ชื่อพนักงาน</th>
+                            <th>เส้นทาง (จุดเริ่มต้น ➔ จุดปลายทาง)</th>
+                            <th>ระยะทาง</th>
+                            <th class="text-end">ยอดเงินที่ต้องจ่าย</th>
+                            <th>หมายเหตุ</th>
+                            <th class="text-center">สถานะการจ่ายเงิน</th>
+                            <th class="text-center">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script จัดการคำนวณ ดึงที่อยู่ และประวัติ -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            calculateEmployeeStats();
+            updateEmpAddress();
+            loadTripHistory();
+            calculateTripCost();
+        });
+
+        function updateEmpAddress() {
+            let select = document.getElementById('calcEmp');
+            let selectedOption = select.options[select.selectedIndex];
+            let address = selectedOption.getAttribute('data-address');
+            document.getElementById('calcStart').value = address;
+        }
+
+        function autoCalculateDistance() {
+            let endInput = document.getElementById('calcEnd').value.toLowerCase().trim();
+            let kmField = document.getElementById('calcKm');
+
+            let distanceMap = {
+                'นนทบุรี': 263,
+                'ปทุมธานี': 244,
+                'สมุทรปราการ': 300,
+                'สมุทรสาคร': 36,
+                'นครปฐม': 56,
+                'อยุธยา': 76,
+                'พระนครศรีอยุธยา': 76,
+                'สระบุรี': 107,
+                'ลพบุรี': 153,
+                'อ่างทอง': 105,
+                'สิงห์บุรี': 138,
+                'ชัยนาท': 194,
+                'สมุทรสงคราม': 74,
+                'ราชบุรี': 100,
+                'เพชรบุรี': 123,
+                'หัวหิน': 196,
+                'ประจวบคีรีขันธ์': 281,
+                'กาญจนบุรี': 129,
+                'สุพรรณบุรี': 107,
+                'นครนายก': 105,
+
+                // ภาคตะวันออก
+                'ฉะเชิงเทรา': 75,
+                'ปราจีนบุรี': 135,
+                'สระแก้ว': 245,
+                'ชลบุรี': 81,
+                'พัทยา': 140,
+                'ระยอง': 179,
+                'จันทบุรี': 245,
+                'ตราด': 315,
+
+                // ภาคตะวันออกเฉียงเหนือ (อีสาน)
+                'นครราชสีมา': 259,
+                'โคราช': 259,
+                'บุรีรัมย์': 385,
+                'สุรินทร์': 457,
+                'ศรีสะเกษ': 517,
+                'อุบลราชธานี': 629,
+                'ยโสธร': 531,
+                'อำนาจเจริญ': 585,
+                'ชัยภูมิ': 342,
+                'ขอนแก่น': 449,
+                'มหาสารคาม': 470,
+                'ร้อยเอ็ด': 512,
+                'กาฬสินธุ์': 519,
+                'สกลนคร': 647,
+                'นครพนม': 735,
+                'มุกดาหาร': 642,
+                'อุดร': 564,
+                'อุดรธานี': 564,
+                'หนองคาย': 615,
+                'หนองบัวลำภู': 538,
+                'เลย': 540,
+
+                // ภาคเหนือ
+                'นครสวรรค์': 237,
+                'กำแพงเพชร': 358,
+                'พิจิตร': 344,
+                'พิษณุโลก': 377,
+                'เพชรบูรณ์': 347,
+                'สุโขทัย': 427,
+                'อุตรดิตถ์': 491,
+                'แพร่': 555,
+                'น่าน': 668,
+                'พะเยา': 734,
+                'เชียงราย': 785,
+                'ลำปาง': 599,
+                'ลำพูน': 670,
+                'เชียงใหม่': 696,
+                'แม่ฮ่องสอน': 924,
+                'ตาก': 426,
+
+                // ภาคใต้
+                'ชุมพร': 498,
+                'ระนอง': 568,
+                'สุราษฎร์ธานี': 645,
+                'พังงา': 788,
+                'ภูเก็ต': 842,
+                'กระบี่': 814,
+                'นครศรีธรรมราช': 780,
+                'ตรัง': 828,
+                'พัทลุง': 840,
+                'สงขลา': 950,
+                'หาดใหญ่': 930,
+                'ปัตตานี': 1055,
+                'ยะลา': 1084,
+                'นราธิวาส': 1149
+            };
+
+            let foundKm = 50; 
+            for (let key in distanceMap) {
+                if (endInput.includes(key)) {
+                    foundKm = distanceMap[key];
+                    break;
+                }
+            }
+
+            kmField.value = foundKm;
+            calculateTripCost();
+        }
+
+        function openGoogleDirections() {
+            let start = document.getElementById('calcStart').value;
+            let end = document.getElementById('calcEnd').value;
+            if(!end) {
+                alert("กรุณากรอกจุดปลายทางก่อนเช็คเส้นทาง");
+                return;
+            }
+            let url = `https://www.google.com/maps/dir/${encodeURIComponent(start)}/${encodeURIComponent(end)}`;
+            window.open(url, '_blank');
+        }
+
+        // คำนวณสถิติพนักงานทั้งหมด กรุงเทพ/ต่างจังหวัด
+        function calculateEmployeeStats() {
+            let rows = document.querySelectorAll("#employeeTable tbody tr");
+            let total = 0, bkkCount = 0, provincialCount = 0;
+
+            rows.forEach(row => {
+                let addressEl = row.querySelector(".address-text");
+                if (!addressEl) return;
+                total++;
+                let address = addressEl.getAttribute("data-address") || "";
+                if(address.includes("กรุงเทพ") || address.includes("ปทุมธานี") || address.includes("นนทบุรี")) {
+                    bkkCount++;
+                } else {
+                    provincialCount++;
+                }
+            });
+
+            document.getElementById('totalCount').innerText = total + " คน";
+            document.getElementById('bkkCount').innerText = bkkCount + " คน";
+            document.getElementById('provincialCount').innerText = provincialCount + " คน";
+        }
+
+        function calculateTripCost() {
+            let km = parseFloat(document.getElementById('calcKm').value) || 0;
+            let rate = parseFloat(document.getElementById('calcRate').value) || 0;
+            let total = km * rate;
+            document.getElementById('previewCost').innerText = "฿" + total.toLocaleString();
+        }
+
+        function saveTripRecord() {
+            let emp = document.getElementById('calcEmp').value;
+            let start = document.getElementById('calcStart').value;
+            let end = document.getElementById('calcEnd').value;
+            let km = document.getElementById('calcKm').value;
+            let rate = document.getElementById('calcRate').value;
+            let cost = km * rate;
+            let note = document.getElementById('calcNote').value || "-";
+
+            if(!end) {
+                alert("กรุณากรอกจุดปลายทาง");
+                return;
+            }
+
+            let records = JSON.parse(localStorage.getItem('tripRecords')) || [];
+            records.push({
+                id: Date.now(),
+                emp: emp,
+                route: start + " ➔ " + end,
+                km: km + " กม.",
+                cost: cost,
+                note: note,
+                paid: false
+            });
+
+            localStorage.setItem('tripRecords', JSON.stringify(records));
+            document.getElementById('calcEnd').value = "";
+            document.getElementById('calcNote').value = "";
+            document.getElementById('calcKm').value = "50";
+            calculateTripCost();
+            loadTripHistory();
+            alert("บันทึกรายการเดินทางสำเร็จ!");
+        }
+
+        // โหลดประวัติและคำนวณยอดเงินรวมจากทริปที่บันทึกมาแสดงที่การ์ดด้านบน
+        function loadTripHistory() {
+            let tbody = document.getElementById('historyBody');
+            tbody.innerHTML = "";
+            let records = JSON.parse(localStorage.getItem('tripRecords')) || [];
+            let totalTripCost = 0;
+
+            if(records.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-3">ยังไม่มีประวัติการบันทึกการเดินทาง</td></tr>`;
+                document.getElementById('totalAllowance').innerText = "฿0";
+                return;
+            }
+
+            records.forEach((rec, index) => {
+                totalTripCost += parseFloat(rec.cost) || 0;
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>#${index + 1}</td>
+                    <td class="fw-semibold">${rec.emp}</td>
+                    <td>${rec.route}</td>
+                    <td>${rec.km}</td>
+                    <td class="text-end fw-bold text-success">฿${rec.cost.toLocaleString()}</td>
+                    <td><small class="text-muted">${rec.note}</small></td>
+                    <td class="text-center">
+                        ${rec.paid ? '<span class="badge bg-success">จ่ายเงินแล้ว ✓</span>' : '<span class="badge bg-warning text-dark">ค้างจ่าย</span>'}
+                    </td>
+                    <td class="text-center">
+                        <button class="btn btn-sm ${rec.paid ? 'btn-outline-secondary' : 'btn-outline-success'} py-0 px-2" style="font-size:11px;" onclick="togglePaid(${rec.id})">
+                            ${rec.paid ? 'ยกเลิกจ่าย' : '✔ บันทึกจ่ายแล้ว'}
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger py-0 px-1 ms-1" style="font-size:11px;" onclick="deleteRecord(${rec.id})">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // อัปเดตยอดรวมเงินค่าเดินทางทริปทั้งหมดขึ้นไปแสดงที่การ์ดด้านบน
+            document.getElementById('totalAllowance').innerText = "฿" + totalTripCost.toLocaleString();
+        }
+
+        function togglePaid(id) {
+            let records = JSON.parse(localStorage.getItem('tripRecords')) || [];
+            records = records.map(r => {
+                if(r.id === id) r.paid = !r.paid;
+                return r;
+            });
+            localStorage.setItem('tripRecords', JSON.stringify(records));
+            loadTripHistory();
+        }
+
+        function deleteRecord(id) {
+            if(confirm("ต้องการลบประวัตินี้ใช่หรือไม่?")) {
+                let records = JSON.parse(localStorage.getItem('tripRecords')) || [];
+                records = records.filter(r => r.id !== id);
+                localStorage.setItem('tripRecords', JSON.stringify(records));
+                loadTripHistory();
+            }
+        }
+
+        function searchTable() {
+            let input = document.getElementById('searchInput').value.toLowerCase().trim();
+            let regionSelect = document.getElementById('regionFilter').value.toLowerCase();
+            let table = document.getElementById('employeeTable');
+            let tr = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < tr.length; i++) {
+                let tdText = tr[i].textContent || tr[i].innerText;
+                let matchesSearch = tdText.toLowerCase().indexOf(input) > -1;
+                let matchesRegion = regionSelect === "" || tdText.toLowerCase().indexOf(regionSelect) > -1;
+                tr[i].style.display = (matchesSearch && matchesRegion) ? "" : "none";
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

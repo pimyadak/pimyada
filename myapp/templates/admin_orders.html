@@ -1,0 +1,124 @@
+{% extends 'basetemplate.html' %}
+{% block title %}รายการคำสั่งซื้อทั้งหมด - PM Mobile Store{% endblock %}
+
+{% block content %}
+<style>
+    /* 1. Navbar สไตล์พลาสเทล */
+    .navbar-custom {
+        background: rgba(255, 240, 243, 0.85) !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 182, 193, 0.4);
+        box-shadow: 0 4px 20px rgba(255, 182, 193, 0.15);
+    }
+    .navbar-custom .navbar-brand,
+    .navbar-custom .nav-link {
+        color: #6d4c53 !important;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    .navbar-custom .nav-link:hover,
+    .navbar-custom .nav-link.active {
+        color: #d63384 !important;
+    }
+
+    /* 2. สไตล์การ์ดตารางคำสั่งซื้อ */
+    .card-admin-pastel {
+        border: none !important;
+        border-radius: 24px !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        box-shadow: 0 10px 30px rgba(255, 182, 193, 0.25) !important;
+        border-top: 5px solid #ffb6c1 !important;
+    }
+    .text-pink-custom {
+        color: #d63384 !important;
+    }
+    .table-pastel th {
+        background-color: #fff0f3 !important;
+        color: #6d4c53 !important;
+        font-weight: 600;
+        border-bottom: 2px solid #ffccd5;
+    }
+    .badge-payment {
+        background-color: #ffe5ec;
+        color: #d63384;
+        font-weight: 500;
+        padding: 6px 12px;
+        border-radius: 50px;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const nav = document.querySelector(".navbar");
+        if (nav) {
+            nav.classList.add("navbar-custom", "fixed-top");
+            document.body.style.paddingTop = "85px";
+        }
+    });
+</script>
+
+<div class="container my-4">
+    <div class="card p-4 card-admin-pastel w-100 shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold text-pink-custom m-0">📦 รายการคำสั่งซื้อของลูกค้า (Staff Dashboard)</h3>
+                <p class="text-muted small mt-1">รายการสั่งซื้อสินค้าทั้งหมดที่ลูกค้าทำรายการเข้ามาผ่านหน้าเว็บไซต์</p>
+            </div>
+            <span class="badge bg-light text-pink-custom border border-pink-subtle px-3 py-2 rounded-pill fs-6">
+                <i class="fa-solid fa-cart-check me-1"></i> คำสั่งซื้อทั้งหมด: {{ orders_list.count }} รายการ
+            </span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle table-pastel">
+                <thead>
+                    <tr>
+                        <th class="py-3">#</th>
+                        <th class="py-3">สินค้าที่สั่งซื้อ</th>
+                        <th class="py-3">ราคารวม</th>
+                        <th class="py-3">ชื่อลูกค้า / เบอร์โทร</th>
+                        <th class="py-3">ที่อยู่จัดส่ง</th>
+                        <th class="py-3">ช่องทางชำระเงิน</th>
+                        <th class="py-3 text-center">วันที่สั่งซื้อ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders_list %}
+                    <tr>
+                        <td class="fw-semibold text-secondary">{{ forloop.counter }}</td>
+                        <td>
+                            <strong class="text-pink-custom fs-6">{{ order.product_name }}</strong>
+                        </td>
+                        <td>
+                            <span class="fw-bold text-danger">{{ order.price }} บาท</span>
+                        </td>
+                        <td>
+                            <div class="fw-bold text-dark">{{ order.fullname }}</div>
+                            <small class="text-primary"><i class="fa-solid fa-phone me-1"></i>{{ order.phone }}</small>
+                        </td>
+                        <td style="max-width: 250px;">
+                            <span class="text-dark small">{{ order.address }}</span>
+                        </td>
+                        <td>
+                            <span class="badge-payment">
+                                {% if order.payment == 'qr' %}สแกน QR Code
+                                {% elif order.payment == 'transfer' %}โอนผ่านธนาคาร
+                                {% else %}เก็บเงินปลายทาง (COD){% endif %}
+                            </span>
+                        </td>
+                        <td class="text-center text-muted small">
+                            {{ order.created_at|date:"d M Y | H:i" }} น.
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">ยังไม่มีรายการสั่งซื้อจากลูกค้าในขณะนี้ 🌸</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

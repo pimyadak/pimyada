@@ -1,0 +1,53 @@
+{% extends 'basetemplate.html' %}
+{% load static %}
+
+{% block title %}หน้าหลัก - PM Mobile Store{% endblock %}
+
+{% block content %}
+<!-- Hero Banner ต้อนรับสุดพรีเมียม -->
+<div class="p-5 mb-5 rounded-4 text-white text-center shadow-sm" style="background: linear-gradient(135deg, #0d6efd, #0dcaf0);">
+    <div class="container py-4">
+        <h1 class="display-5 fw-bold mb-3">ยินดีต้อนรับสู่ PM Mobile Store</h1>
+        <p class="fs-5 mb-4 opacity-75">แหล่งรวมอุปกรณ์ไอทีและแกดเจ็ตที่ทันสมัยที่สุดสำหรับคุณ</p>
+        <a href="/product/" class="btn btn-light text-primary fw-semibold btn-lg px-4 rounded-pill shadow-sm">
+            <i class="fa-solid fa-cart-shopping me-2"></i>เริ่มต้นช็อปปิ้งออนไลน์
+        </a>
+    </div>
+</div>
+
+<!-- ส่วนจุดประสงค์ของเว็บไซต์ (ปรับให้อยู่ในกล่องดีไซน์สะอาดตา) -->
+<div class="row justify-content-center mb-5">
+    <div class="col-lg-8 text-center">
+        <h3 class="fw-bold text-dark mb-3">จุดประสงค์ของเว็บไซต์</h3>
+        <p class="text-muted lead">
+            เว็บไซต์นี้จัดทำขึ้นโดยมีจุดประสงค์เพื่อนำเสนอสินค้าและแกดเจ็ตไอทีสุดอินเทรนด์ มีการทำงานที่รวดเร็ว มั่นคง และแสดงผลข้อมูลอย่างสวยงามบนอุปกรณ์ของคุณ
+        </p>
+    </div>
+</div>
+
+<!-- ตัวอย่าง: ส่วนสินค้าแนะนำ (ถ้ามีข้อมูลส่งมาจาก Django View) -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold text-dark m-0"><i class="fa-solid fa-fire text-danger me-2"></i>สินค้าแนะนำยอดนิยม</h3>
+    <a href="/product/" class="text-decoration-none text-primary fw-semibold">ดูทั้งหมด <i class="fa-solid fa-arrow-right ms-1"></i></a>
+</div>
+
+<div class="row g-4 mb-5">
+    <!-- วนลูปแสดงสินค้าจาก Backend (ตัวอย่าง Static Card) -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-3 h-100 product-card">
+            <div class="bg-light text-center p-4 rounded-top" style="height: 200px; display: flex; align-items: center; justify-content: center;">
+                <i class="fa-solid fa-mobile-screen fa-4x text-secondary opacity-50"></i>
+            </div>
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title fw-bold text-dark">สมาร์ตโฟนรุ่นใหม่ล่าสุด</h5>
+                <p class="card-text text-muted small">สเปกแรง กล้องคมชัด ดีไซน์หรูหราพรีเมียม</p>
+                <div class="d-flex justify-content-between align-items-center mt-auto">
+                    <span class="text-primary fw-bold fs-5">฿29,900</span>
+                    <a href="/product/" class="btn btn-outline-primary btn-sm rounded-pill px-3">ดูรายละเอียด</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- สามารถเพิ่ม Card อื่นๆ หรือใช้ลูป {% for product in products %} ตามระบบ Django ของคุณได้เลย -->
+</div>
+{% endblock %}

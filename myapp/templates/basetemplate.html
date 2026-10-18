@@ -1,0 +1,269 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PM Mobile Store{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome สำหรับไอคอน -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2Lw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        * {
+            font-family: 'Sarabun', sans-serif !important;
+        }
+        body {
+            background-color: #faf7f8;
+        }
+
+        /* 🌸 Glassmorphism Navbar ชมพูพาสเทลโปร่งแสงเรียบหรู */
+        .navbar-pastel {
+            background: rgba(255, 240, 243, 0.9) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 182, 193, 0.4);
+            box-shadow: 0 4px 20px rgba(255, 182, 193, 0.15);
+        }
+        .navbar-pastel .navbar-brand {
+            color: #d63384 !important;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+        .navbar-pastel .nav-link {
+            color: #5a3d40 !important;
+            font-weight: 500;
+            padding: 8px 14px !important;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+        .navbar-pastel .nav-link:hover, 
+        .navbar-pastel .nav-link.active {
+            color: #d63384 !important;
+            background-color: rgba(255, 229, 236, 0.6);
+        }
+
+        /* 🛍️ Dropdown เมนู "รายการ" ดีไซน์การ์ดพาสเทลโค้งมน */
+        .dropdown-menu-pastel {
+            border: 1px solid rgba(255, 182, 193, 0.3) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 12px 35px rgba(255, 154, 158, 0.2) !important;
+            background: rgba(255, 255, 255, 0.98) !important;
+            padding: 10px !important;
+            min-width: 250px;
+            margin-top: 10px !important;
+        }
+        .dropdown-item-pastel {
+            border-radius: 12px !important;
+            padding: 10px 16px !important;
+            color: #4a3538 !important;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+        .dropdown-item-pastel:hover {
+            background-color: #fff0f3 !important;
+            color: #d63384 !important;
+            transform: translateX(4px);
+        }
+        .menu-icon {
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #fff0f3 !important;
+            color: #6d4c53 !important;
+            border-top: 1px solid #ffccd5;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100" style="padding-top: 75px;">
+
+    <!-- Navbar หลัก -->
+    <nav class="navbar navbar-expand-lg navbar-pastel fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">🌸 PM Mobile Store</a>
+            
+            <!-- ปุ่ม Toggler สำหรับเปิด-ปิดเมนูบนหน้าจอขนาดเล็ก -->
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav me-auto align-items-lg-center">
+                    <!-- เมนูพื้นฐานที่ทุกคนมองเห็น -->
+                    <a class="nav-link" href="{% url 'home' %}">หน้าหลัก</a>
+                    <a class="nav-link" href="{% url 'product' %}">หน้าสินค้า</a>
+                    <a class="nav-link" href="{% url 'about' %}">หน้าติดต่อสอบถาม</a>
+                    
+                    <!-- 🔒 เงื่อนไขการแสดงเมนูจัดการภายใน -->
+                    {% if request.user.is_authenticated %}
+                        {% if request.user.is_staff or request.user.is_superuser or request.session.verified_employee %}
+                            <!-- เมนู "รายการ" สำหรับแอดมิน หรือ พนักงานที่ยืนยันรหัสแล้ว -->
+                            <li class="nav-item dropdown ms-lg-1">
+                                <a class="nav-link dropdown-toggle fw-semibold" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: #d63384 !important;">
+                                    📋 รายการ 
+                                    {% if request.session.verified_employee %}
+                                        <span class="badge bg-light text-dark border" style="font-size: 10px;">(รหัส: {{ request.session.verified_employee }})</span>
+                                    {% endif %}
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-pastel dropdown-menu-end dropdown-menu-lg-start" aria-labelledby="navbarDropdown">
+                                    <li>
+                                        <a class="dropdown-item dropdown-item-pastel" href="{% url 'person' %}">
+                                            <span class="menu-icon"><i class="fa-solid fa-users"></i></span> ข้อมูลพนักงาน
+                                        </a>
+                                    </li>
+                                    
+                                    {% if request.user.is_staff or request.user.is_superuser %}
+                                    <li>
+                                        <a class="dropdown-item dropdown-item-pastel" href="{% url 'form_view' %}">
+                                            <span class="menu-icon"><i class="fa-solid fa-file-signature"></i></span> ฟอร์มบันทึกข้อมูลพนักงาน
+                                        </a>
+                                    </li>
+                                    {% endif %}
+
+                                    <li>
+                                        <a class="dropdown-item dropdown-item-pastel" href="{% url 'attendance' %}">
+                                            <span class="menu-icon"><i class="fa-solid fa-clock"></i></span> เช็คเวลาเข้า-ออกงาน
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item dropdown-item-pastel" href="{% url 'leave' %}">
+                                            <span class="menu-icon"><i class="fa-solid fa-file-medical"></i></span> ระบบยื่นใบลา (ขอลา)
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item dropdown-item-pastel" href="{% url 'admin_messages' %}">
+                                            <span class="menu-icon"><i class="fa-solid fa-comments"></i></span> กล่องข้อความ
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item dropdown-item-pastel" href="{% url 'admin_orders' %}">
+                                             <span class="menu-icon"><i class="fa-solid fa-box"></i></span> รายการคำสั่งซื้อสินค้า
+                                        </a>
+                                    </li>
+                                    
+                                    {% if request.user.is_staff or request.user.is_superuser %}
+                                    <li><hr class="dropdown-divider my-2" style="border-color: #ffe5ec;"></li>
+                                    <li>
+                                        <a class="dropdown-item dropdown-item-pastel" href="{% url 'admin:index' %}">
+                                            <span class="menu-icon"><i class="fa-solid fa-user-shield"></i></span> ผู้ดูแลระบบ (Django Admin)
+                                        </a>
+                                    </li>
+                                    {% endif %}
+
+                                    <!-- ถ้าเป็นพนักงานทั่วไปที่ยืนยันรหัสแล้ว ให้มีปุ่มออกโหมดพนักงานได้ -->
+                                    {% if request.session.verified_employee and not request.user.is_staff %}
+                                    <li><hr class="dropdown-divider my-2" style="border-color: #ffe5ec;"></li>
+                                    <li>
+                                        <a class="dropdown-item dropdown-item-pastel text-danger" href="{% url 'logout_employee' %}">
+                                            <span class="menu-icon"><i class="fa-solid fa-right-from-bracket"></i></span> ออกจากโหมดพนักงาน
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </li>
+                        {% else %}
+                            <!-- สำหรับพนักงานทั่วไปที่ยังไม่ได้ยืนยันรหัส จะเห็นปุ่มนี้แทน -->
+                            <li class="nav-item ms-lg-2">
+                                <button type="button" class="btn btn-sm px-3 py-2 rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#verifyEmpModal" style="background-color: #fff0f3; color: #d63384; font-weight: 600; border: 1px solid #ffb6c1;">
+                                    <i class="fa-solid fa-id-card me-1"></i> ยืนยันรหัสพนักงาน
+                                </button>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <!-- ส่วนโปรไฟล์และปุ่ม Logout หลัก -->
+                <div class="d-flex align-items-center mt-3 mt-lg-0">
+                    {% if request.user.is_authenticated %}
+                        <span class="me-3 small fw-semibold text-secondary">สวัสดี, {{ request.user.username }}</span>
+                        <a href="{% url 'logout' %}" class="btn btn-sm rounded-pill px-4 py-2" style="background-color: #ffe5ec; color: #d63384; font-weight: 600; border: none;">ออกจากระบบ</a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-sm px-3 me-2" style="color: #6d4c53;">เข้าสู่ระบบ</a>
+                        <a href="{% url 'register' %}" class="btn btn-sm px-4 py-2 rounded-pill" style="background: linear-gradient(135deg, #ff9a9e, #fecfef); color: #4a3538; font-weight: 600; border: none;">สมัครสมาชิก</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content พื้นที่แสดงเนื้อหาแต่ละหน้า -->
+    <div class="container my-5">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Footer ส่วนท้าย -->
+    <footer class="text-center py-3 mt-auto">
+        <div class="container">
+            <p class="mb-0 fw-semibold">© 2026 PM Mobile Store. All rights reserved[cite: 6].</p>
+            <p class="mb-0 text-muted" style="font-size: 0.85em;">จัดทำโดย พิมพ์ญาดา คำนิล รหัสนักศึกษา 671321119[cite: 6]</p>
+        </div>
+    </footer>
+
+    <!-- Modal สำหรับกรอกรหัสพนักงาน -->
+    <div class="modal fade" id="verifyEmpModal" tabindex="-1" aria-labelledby="verifyEmpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow" style="border-radius: 20px;">
+                <div class="modal-header border-0 pb-0" style="background-color: #fff0f3; border-radius: 20px 20px 0 0;">
+                    <h5 class="modal-title fw-bold text-pink-custom" id="verifyEmpModalLabel">
+                        <i class="fa-solid fa-id-badge me-2"></i>ยืนยันรหัสพนักงาน
+                    </h5>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{% url 'verify_employee' %}">
+                    {% csrf_token %}
+                    <div class="modal-body p-4" style="background-color: #fff0f3;">
+                        <p class="text-muted small mb-3">กรุณากรอกรหัสพนักงานของคุณ</p>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">รหัสพนักงาน</label>
+                            <input type="text" name="emp_id" class="form-control rounded-pill px-3 py-2 border-0 shadow-sm" placeholder="ระบุรหัสพนักงาน..." required>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 px-4 pb-4" style="background-color: #fff0f3; border-radius: 0 0 20px 20px;">
+                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn rounded-pill px-4 text-white shadow-sm" style="background-color: #d63384; font-weight: 600;">ยืนยันสิทธิ์</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript ดึงข้อมูล API พนักงาน -->
+    <script>
+    fetch('http://127.0.0.1:8000/api/employees/')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('ไม่สามารถดึงข้อมูลได้');
+            }
+            return response.json();
+        })
+        .then(data => {
+            let output = '';
+            data.forEach(emp => {
+                output += `<li>ชื่อ: ${emp.fname} ${emp.lname} แผนก: ${emp.department}</li>`;
+            });
+            const listElement = document.getElementById('employee-list');
+            if (listElement) {
+                listElement.innerHTML = output;
+            }
+        })
+        .catch(error => console.error('เกิดข้อผิดพลาด:', error));
+    </script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+{% extends 'basetemplate.html' %}
+{% block content %}
+
+<div class="container mt-5">
+    <h2 style="text-align: center; margin-bottom: 30px;">แก้ไขข้อมูลพนักงาน</h2>
+    
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <table style="width: 100%; max-width: 600px; margin: 0 auto; border-collapse: separate; border-spacing: 10px;">
+            <tr>
+            <td><label>ชื่อ:</label></td>
+            <td><input type="text" name="fname" class="form-control" value="{{ person.fname }}"></td>
+        </tr>
+
+             <tr>
+            <td><label>นามสกุล:</label></td>
+            <td><input type="text" name="lname" class="form-control" value="{{ person.lname }}"></td>
+        </tr>
+
+    
+        <tr>
+            <td><label>อายุ:</label></td>
+            <td><input type="number" name="age" value="{{ person.age }}" required></td>
+        </tr>
+
+            <tr>
+            <td style="vertical-align: top;">ที่อยู่:</td>
+            <td><textarea name="address" class="form-control" rows="4">{{ person.address }}</textarea></td>
+        </tr>
+
+            <tr>
+            <td>เพศ:</td>
+            <td>
+                <input type="radio" name="gender" value="male" {% if person.gender == 'male' %}checked{% endif %}> ชาย
+                <input type="radio" name="gender" value="female" {% if person.gender == 'female' %}checked{% endif %}> หญิง
+            </td>
+        </tr>
+        
+            <tr>
+            <td>วันเกิด:</td>
+            <td>
+                <!-- ในไฟล์ edit.html -->
+                <input type="date" name="birthdate" value="{{ person.birthdate|date:'Y-m-d' }}" class="form-control" required>
+            </td>
+        </tr>
+
+            <tr>
+            <td>แผนก:</td>
+            <td>
+                <select name="department" class="form-control">
+                    <option value="Admin" {% if person.department == 'แอดมิน' %}selected{% endif %}>แอดมิน</option>
+                    <option value="hr" {% if person.department == 'บุคคล' %}selected{% endif %}>บุคคล</option>
+                    <option value="ไอที" {% if person.department == 'ไอที' %}selected{% endif %}>ไอที</option>
+                    <option value="sales" {% if person.department == 'ฝ่ายขาย' %}selected{% endif %}>ฝ่ายขาย</option>
+                </select>
+            </td>
+        </tr>
+
+            <tr>
+            <td><label>เงินเดือน:</label></td>
+            <td><input type="number" name="salary" class="form-control" value="{{ person.salary }}"></td>
+        </tr>
+
+             <tr>
+            <td>รูปภาพ:</td>
+            <td>
+                <input type="file" name="image" class="form-control">
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2">
+            {% if error %}
+            <div style="color: red; font-weight: bold; margin: 10px 0;">
+                {{ error }}
+            </div>
+            {% endif %}
+             </td>
+        </tr>
+
+
+            <tr>
+            <td></td>
+            <td>
+                <button type="submit" class="btn btn-primary">บันทึกการแก้ไข</button>
+            </td>
+        </tr>
+    </table>
+</form>
+</div>
+
+{% endblock %}

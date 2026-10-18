@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>PM Mobile Store - สถานะการทำงานของพนักงาน</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <!-- Navbar ตามแบบฉบับเว็บของคุณ -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4">
+        <a class="navbar-brand" href="#">PM Mobile Store</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">หน้าหลัก</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'product' %}">หน้าสินค้า</a></li>
+                <li class="nav-item"><a class="nav-link active" href="{% url 'person' %}">ข้อมูลพนักงาน</a></li>
+                <li class="nav-item"><a class="nav-link text-danger" href="#">ออกจากระบบ</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <h2 class="text-center mb-4">ตารางสถานะการทำงานพนักงาน</h2>
+
+        <!-- ฟอร์มค้นหา -->
+        <form method="GET" class="input-group mb-4" style="max-width: 400px; margin: 0 auto;">
+            <input type="text" name="q" class="form-control" placeholder="ค้นหาชื่อพนักงาน..." value="{{ query }}">
+            <button class="btn btn-primary" type="submit">ค้นหา</button>
+        </form>
+
+        <!-- ตารางแสดงข้อมูล -->
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0 align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th scope="col">รหัสพนักงาน</th>
+            <th scope="col" class="ps-3">รูปภาพ</th>
+            <th scope="col">ชื่อ-นามสกุล</th>
+            <th scope="col">แผนก</th>
+            <th scope="col">เวลาเข้างาน (Check-in)</th>
+            <th scope="col">เวลาออกงาน (Check-out)</th>
+            <th scope="col" class="text-center">สถานะ</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for emp in employees %}
+        <tr>
+            <!-- 1. รหัสพนักงาน -->
+            <td>{{ emp.emp_id }}</td>
+            
+            <!-- 2. รูปภาพพนักงาน -->
+            <td class="ps-3">
+                {% if emp.pics %}
+                    <img src="{{ emp.pics.url }}" alt="รูปพนักงาน" class="rounded-circle" width="45" height="45" style="object-fit: cover;">
+                {% else %}
+                    <img src="https://via.placeholder.com/45" alt="Default" class="rounded-circle" width="45" height="45">
+                {% endif %}
+            </td>
+
+            <!-- 3. ชื่อ-นามสกุล -->
+            <td>{{ emp.fname }} {{ emp.lname }}</td>
+
+            <!-- 4. แผนก -->
+            <td>{{ emp.department|default:"-" }}</td>
+
+            <!-- 5. เวลาเข้างาน -->
+            <td>{{ emp.check_in_time|date:"d/m/Y H:i"|default:"ยังไม่เข้างาน" }}</td>
+
+            <!-- 6. เวลาออกงาน -->
+            <td>{{ emp.check_out_time|date:"d/m/Y H:i"|default:"-" }}</td>
+
+            <!-- 7. สถานะ -->
+            <td class="text-center">
+                {% if emp.is_online %}
+                    <span class="badge bg-success">🟢 กำลังทำงาน (Online)</span>
+                {% else %}
+                    <span class="badge bg-secondary">🔴 ออกจากงาน (Offline)</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7" class="text-center py-4 text-muted">ไม่พบข้อมูลพนักงาน</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    
+</table>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

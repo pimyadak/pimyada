@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>ตารางข้อมูลพนักงาน</title>
+    <!-- ใช้งาน Bootstrap 5 จาก CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="card shadow border-0">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
+                <h3 class="mb-0">📋 รายชื่อพนักงานทั้งหมด (Employee Table)</h3>
+                <a href="/api/employees/" class="btn btn-light btn-sm fw-bold">ไปที่หน้า API JSON</a>
+            </div>
+            <div class="card-body p-4">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>ชื่อ - นามสกุล</th>
+                                <th>ที่อยู่</th>
+                                <th>เพศ</th>
+                                <th>แผนก</th>
+                                <th>เงินเดือน</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for emp in employees %}
+                            <tr>
+                                <td>{{ emp.id }}</td>
+                                <td class="fw-bold">{{ emp.fname }} {{ emp.lname }}</td>
+                                <td>{{ emp.address|default:"-" }}</td>
+                                <td>{{ emp.gender|default:"-" }}</td>
+                                <td><span class="badge bg-info text-dark">{{ emp.department|default:"-" }}</span></td>
+                                <td class="text-success fw-bold">{{ emp.salary|default:"0.00" }} ฿</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">ยังไม่มีข้อมูลพนักงานในระบบ</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

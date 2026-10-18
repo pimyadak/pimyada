@@ -1,0 +1,46 @@
+{% extends 'basetemplate.html' %} <!-- หรือชื่อไฟล์ Template หลักของคุณ -->
+{% block content %}
+
+<div class="container mt-5">
+    <h2 class="mb-4">รายการสต็อกสินค้าทั้งหมด</h2>
+    
+    <!-- ส่วนเพิ่มสินค้า -->
+    <form method="POST" action="{% url 'add_product' %}" class="mb-4">
+        {% csrf_token %}
+        <div class="input-group" style="max-width: 400px;">
+            <input type="text" name="name" class="form-control" placeholder="กรอกชื่อสินค้าใหม่..." required>
+            <button type="submit" class="btn btn-success">เพิ่มสินค้า</button>
+        </div>
+    </form>
+
+    <table class="table table-hover table-striped shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>ชื่อสินค้า</th>
+            <th>สต็อก</th>
+            <th class="text-center">จัดการ</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in products %}
+        <tr>
+            <td class="align-middle">
+              
+                <form method="POST" action="{% url 'update_product_name' p.id %}" class="d-flex">
+                    {% csrf_token %}
+                    <input type="text" name="new_name" value="{{ p.name }}" class="form-control form-control-sm">
+                    <button type="submit" class="btn btn-sm btn-secondary ms-2">บันทึก</button>
+                </form>
+            </td>
+            <td class="align-middle">{{ p.stock }} ชิ้น</td>
+            <td class="text-center">
+                <a href="{% url 'update_stock' p.id 'decrease' %}" class="btn btn-sm btn-outline-warning">-</a>
+                <a href="{% url 'update_stock' p.id 'increase' %}" class="btn btn-sm btn-outline-primary">+</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% endblock %}

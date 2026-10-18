@@ -1,0 +1,26 @@
+{% extends 'basetemplate.html' %}
+{% block content %}
+<div class="container mt-5" style="max-width: 400px;">
+  <h2 class="mb-4 text-center">สมัครสมาชิก</h2>
+  {% if error %}
+  <div class="alert alert-danger text-center">{{ error }}</div>
+{% endif %}
+  <form method="POST">
+    {% csrf_token %}
+    <div class="mb-3">
+  <label class="form-label">ชื่อผู้ใช้งาน (Username)</label>
+  <input type="text" name="username" class="form-control" autocomplete="off" required>
+</div>
+<div class="mb-3">
+  <label class="form-label">รหัสผ่าน (Password)</label>
+  <input type="password" name="password1" class="form-control" minlength="6" autocomplete="new-password" required>
+</div>
+<div class="mb-3">
+  <label class="form-label">ยืนยันรหัสผ่าน (Confirm Password)</label>
+  <input type="password" name="password2" class="form-control" minlength="6" required>
+</div>
+    <button type="submit" class="btn btn-success w-100">สมัครสมาชิก</button>
+  </form>
+  <p class="text-center mt-3">มีบัญชีอยู่แล้ว? <a href="{% url 'login' %}">เข้าสู่ระบบ</a></p>
+</div>
+{% endblock %}

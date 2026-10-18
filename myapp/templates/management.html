@@ -1,0 +1,28 @@
+{% extends 'basetemplate.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h2><i class="fas fa-tachometer-alt"></i> ระบบจัดการข้อมูลหลังบ้าน</h2>
+        <p class="text-muted">ยินดีต้อนรับสู่ระบบส่วนกลางของคุณ   เลือกหัวข้อที่ต้องการจัดการ</p>
+    </div>
+
+    <!-- ในไฟล์ management.html ให้เหลือแค่ Card แบบนี้ -->
+<div class="row justify-content-center">
+    <!-- Card จัดการสมาชิก -->
+    ...
+    <!-- Card จัดการคลังสินค้า -->
+    <div class="col-md-4">
+        <div class="card shadow-sm text-center p-4">
+            <h5>จัดการคลังสินค้า</h5>
+            <p>สต็อกคงเหลือรวม <strong>{{ total_stock }}</strong> ชิ้น</p>
+            <!-- เปลี่ยน href ให้ลิงก์ไปหน้า stock_list แทน -->
+            <a href="{% url 'stock_list' %}" class="btn btn-success w-100">เข้าสู่ระบบจัดการคลังสินค้า</a>
+        </div>
+    </div>
+</div>
+
+    </div>
+</div>
+{% endblock %}

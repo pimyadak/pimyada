@@ -1,0 +1,125 @@
+{% extends 'basetemplate.html' %}
+{% block title %}ติดต่อสอบถาม - PM Mobile Store{% endblock %}
+
+{% block content %}
+<style>
+    /* 1. Navbar ใสแบบ Glassmorphism ชมพูพลาสเทล */
+    .navbar-custom {
+        background: rgba(255, 240, 243, 0.85) !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 182, 193, 0.4);
+        box-shadow: 0 4px 20px rgba(255, 182, 193, 0.15);
+    }
+    .navbar-custom .navbar-brand,
+    .navbar-custom .nav-link {
+        color: #6d4c53 !important;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    .navbar-custom .nav-link:hover,
+    .navbar-custom .nav-link.active {
+        color: #d63384 !important;
+    }
+
+    /* 2. สไตล์การ์ดผู้จัดทำและฟอร์มแบบพลาสเทลละมุน */
+    .card-profile-pastel {
+        border: none !important;
+        border-radius: 24px !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        box-shadow: 0 10px 30px rgba(255, 182, 193, 0.25) !important;
+        border-top: 5px solid #ffb6c1 !important;
+    }
+    .text-pink-custom {
+        color: #d63384 !important;
+    }
+
+    /* สไตล์ฟอร์มสอบถาม */
+    .form-control-pastel {
+        border: 1.5px solid #ffccd5;
+        border-radius: 12px;
+        padding: 10px 15px;
+        transition: all 0.2s ease;
+    }
+    .form-control-pastel:focus {
+        border-color: #ff85a2;
+        box-shadow: 0 0 8px rgba(255, 133, 162, 0.3);
+        outline: none;
+    }
+    .btn-pink-submit {
+        background: linear-gradient(135deg, #ff9a9e, #fecfef);
+        color: #5a3d40;
+        font-weight: 600;
+        border: none;
+        border-radius: 50px;
+        padding: 12px;
+        transition: all 0.3s ease;
+    }
+    .btn-pink-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 154, 158, 0.4);
+        color: #333;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const nav = document.querySelector(".navbar");
+        if (nav) {
+            nav.classList.add("navbar-custom", "fixed-top");
+            document.body.style.paddingTop = "85px";
+        }
+    });
+</script>
+
+<div class="container my-4 d-flex flex-column align-items-center">
+    
+    <!-- แสดงกล่องแจ้งเตือนเมื่อ Backend บันทึกข้อมูลสำเร็จ (เช็คจากตัวแปร success ที่ส่งมาจาก views.py) -->
+    {% if success %}
+    <div class="alert alert-success alert-dismissible fade show w-100 mb-4 shadow-sm" role="alert" style="max-width: 600px; border-radius: 16px; background-color: #e8f5e9; border-color: #c8e6c9; color: #2e7d32;">
+        <i class="fa-solid fa-circle-check me-2"></i><strong>ส่งข้อความสำเร็จ!</strong> ทีมงานได้รับข้อมูลการสอบถามของคุณเรียบร้อยแล้ว จะรีบติดต่อกลับโดยเร็วที่สุดค่ะ 
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    <!-- ส่วนฟอร์มส่งข้อความสอบถามสำหรับลูกค้า -->
+    <div class="card p-4 card-profile-pastel w-100" style="max-width: 600px;">
+        <h4 class="fw-bold text-pink-custom mb-3 text-center"> ส่งข้อความสอบถาม / ติดต่อเรา</h4>
+        <p class="text-muted text-center small mb-4">กรุณากรอกข้อมูลและข้อความของคุณ ทีมงานจะตอบกลับโดยเร็วที่สุด</p>
+
+    <form action="" method="POST">
+            {% csrf_token %}
+    
+         <div class="mb-3">
+            <label class="form-label fw-semibold text-dark small">ชื่อ-นามสกุลของคุณ</label>
+            <input type="text" name="name" class="form-control form-control-pastel" placeholder="ระบุชื่อของคุณ..." required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold text-dark small">อีเมล หรือ เบอร์โทรศัพท์ติดต่อ</label>
+            <input type="text" name="contact" class="form-control form-control-pastel" placeholder="example@email.com หรือ 08X-XXX-XXXX" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold text-dark small">หัวข้อที่ต้องการสอบถาม</label>
+            <select name="subject" class="form-select form-control-pastel">
+                <option value="สอบถามเรื่องสินค้า">สอบถามเรื่องสินค้า / สเปกสินค้า</option>
+                <option value="สอบถามเรื่องการจัดส่ง">สอบถามเรื่องการจัดส่ง / สถานะพัสดุ</option>
+                <option value="แจ้งปัญหาการใช้งาน">แจ้งปัญหาการใช้งานระบบ</option>
+                <option value="อื่นๆ">อื่นๆ</option>
+            </select>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label fw-semibold text-dark small">รายละเอียดข้อความ</label>
+            <textarea name="message" class="form-control form-control-pastel" rows="4" placeholder="พิมพ์ข้อความของคุณที่นี่..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-pink-submit w-100 shadow-sm">
+            <i class="fa-solid fa-paper-plane me-2"></i>ส่งข้อความสอบถาม
+        </button>
+    </form>
+    </div>
+
+</div>
+{% endblock %}

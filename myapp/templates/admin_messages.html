@@ -1,0 +1,119 @@
+{% extends 'basetemplate.html' %}
+{% block title %}กล่องข้อความลูกค้า (Admin) - PM Mobile Store{% endblock %}
+
+{% block content %}
+<style>
+    /* Navbar สไตล์พลาสเทล */
+    .navbar-custom {
+        background: rgba(255, 240, 243, 0.85) !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 182, 193, 0.4);
+        box-shadow: 0 4px 20px rgba(255, 182, 193, 0.15);
+    }
+    .navbar-custom .navbar-brand,
+    .navbar-custom .nav-link {
+        color: #6d4c53 !important;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    .navbar-custom .nav-link:hover,
+    .navbar-custom .nav-link.active {
+        color: #d63384 !important;
+    }
+
+    /* สไตล์กล่องและตารางหลังบ้าน */
+    .card-admin-pastel {
+        border: none !important;
+        border-radius: 24px !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        box-shadow: 0 10px 30px rgba(255, 182, 193, 0.25) !important;
+        border-top: 5px solid #ffb6c1 !important;
+    }
+    .text-pink-custom {
+        color: #d63384 !important;
+    }
+    .table-pastel th {
+        background-color: #fff0f3 !important;
+        color: #6d4c53 !important;
+        font-weight: 600;
+        border-bottom: 2px solid #ffccd5;
+    }
+    .badge-subject {
+        background-color: #ffe5ec;
+        color: #d63384;
+        font-weight: 500;
+        padding: 6px 12px;
+        border-radius: 50px;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const nav = document.querySelector(".navbar");
+        if (nav) {
+            nav.classList.add("navbar-custom", "fixed-top");
+            document.body.style.paddingTop = "85px";
+        }
+    });
+</script>
+
+<div class="container my-4">
+    <div class="card p-4 card-admin-pastel w-100 shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold text-pink-custom m-0">📥 กล่องข้อความลูกค้าติดต่อ (Admin Dashboard)</h3>
+                <p class="text-muted small mt-1">รายการข้อความและคำถามทั้งหมดที่ลูกค้าส่งเข้ามาผ่านหน้าเว็บไซต์</p>
+            </div>
+            <!-- นับจำนวนข้อความจริงจาก Database -->
+            <span class="badge bg-light text-pink-custom border border-pink-subtle px-3 py-2 rounded-pill fs-6">
+                <i class="fa-solid fa-envelope-open-text me-1"></i> ข้อความทั้งหมด: {{ messages_list.count }} รายการ
+            </span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle table-pastel">
+                <thead>
+                    <tr>
+                        <th class="py-3">#</th>
+                        <th class="py-3">ชื่อ-นามสกุล</th>
+                        <th class="py-3">ช่องทางติดต่อ</th>
+                        <th class="py-3">หัวข้อ</th>
+                        <th class="py-3">ข้อความรายละเอียด</th>
+                        <th class="py-3 text-center">จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for msg in messages_list %}
+                    <tr>
+                        <td class="fw-semibold text-secondary">{{ forloop.counter }}</td>
+                        <td>
+                            <div class="fw-bold text-dark">{{ msg.name }}</div>
+                            <small class="text-muted">{{ msg.created_at|date:"d M Y | H:i" }} น.</small>
+                        </td>
+                        <td>
+                            <span class="text-primary">{{ msg.contact }}</span>
+                        </td>
+                        <td>
+                            <span class="badge-subject">{{ msg.subject }}</span>
+                        </td>
+                        <td style="max-width: 250px;">
+                            <span class="text-dark small">{{ msg.message }}</span>
+                        </td>
+                        <td class="text-center">
+                            <a href="mailto:{{ msg.contact }}" class="btn btn-sm rounded-pill px-3" style="background-color: #ffe5ec; color: #d63384; border: none;">
+                                <i class="fa-solid fa-reply me-1"></i> ตอบกลับ
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">ยังไม่มีข้อความติดต่อจากลูกค้าในขณะนี้ 🌸</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

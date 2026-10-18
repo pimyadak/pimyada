@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Blog</title>
+</head>
+<body>
+    <h1>บทความทั้งหมด</h1>
+    {% for post in posts %}
+        <article>
+            <h2>{{ post.title }}</h2>
+            <p>{{ post.body }}</p>
+            <hr>
+        </article>
+    {% empty %}
+        <p>ยังไม่มีบทความในขณะนี้</p>
+    {% endfor %}
+</body>
+</html>

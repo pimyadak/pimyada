@@ -1,0 +1,87 @@
+{% extends 'basetemplate.html' %}
+{% block title %}ยืนยันคำสั่งซื้อ - PM Mobile Store{% endblock %}
+
+{% block content %}
+<style>
+    .card-checkout {
+        border: none !important;
+        border-radius: 24px !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        box-shadow: 0 10px 30px rgba(255, 182, 193, 0.25) !important;
+        border-top: 5px solid #ffb6c1 !important;
+    }
+    .text-pink-custom {
+        color: #d63384 !important;
+    }
+    .form-control-pastel {
+        border: 1.5px solid #ffccd5;
+        border-radius: 12px;
+        padding: 10px 15px;
+    }
+    .form-control-pastel:focus {
+        border-color: #ff85a2;
+        box-shadow: 0 0 8px rgba(255, 133, 162, 0.3);
+        outline: none;
+    }
+    .btn-pink-order {
+        background: linear-gradient(135deg, #ff9a9e, #fecfef);
+        color: #5a3d40;
+        font-weight: 600;
+        border: none;
+        border-radius: 50px;
+        padding: 12px;
+        transition: all 0.3s ease;
+    }
+    .btn-pink-order:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 154, 158, 0.4);
+        color: #333;
+    }
+</style>
+
+<div class="container my-4 d-flex flex-column align-items-center">
+    <div class="card p-4 card-checkout w-100" style="max-width: 650px;">
+        <h3 class="fw-bold text-pink-custom mb-3 text-center">🛍️ ฟอร์มยืนยันคำสั่งซื้อสินค้า</h3>
+        <p class="text-muted text-center small mb-4">กรุณากรอกข้อมูลจัดส่งสินค้าให้ครบถ้วนเพื่อดำเนินการต่อค่ะ </p>
+
+        <!-- สรุปรายการสินค้าที่เลือก -->
+        <div class="p-3 mb-4 rounded-4" style="background-color: #fff0f3; border: 1px dashed #ffb6c1;">
+            <h5 class="fw-bold text-dark mb-1">📦 สินค้า: <span class="text-pink-custom">{{ product_name }}</span></h5>
+            <p class="mb-0 text-muted">ราคารวมทั้งสิ้น: <strong class="text-danger fs-5">{{ price }} บาท</strong></p>
+        </div>
+
+        <!-- ตรงแท็ก <form> ให้เอา onsubmit ออก เหลือแค่ action และ method แบบนี้ -->
+<form action="" method="POST">
+    {% csrf_token %}
+    
+    <div class="mb-3">
+        <label class="form-label fw-semibold text-dark small">ชื่อ-นามสกุล ผู้รับสินค้า</label>
+        <input type="text" name="fullname" class="form-control form-control-pastel" placeholder="ระบุชื่อ-นามสกุลจริง..." required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-semibold text-dark small">เบอร์โทรศัพท์ที่ติดต่อได้</label>
+        <input type="text" name="phone" class="form-control form-control-pastel" placeholder="08X-XXX-XXXX" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-semibold text-dark small">ที่อยู่จัดส่งสินค้า</label>
+        <textarea name="address" class="form-control form-control-pastel" rows="3" placeholder="บ้านเลขที่, ถนน, ตำบล, อำเภอ, จังหวัด และรหัสไปรษณีย์..." required></textarea>
+    </div>
+
+    <div class="mb-4">
+        <label class="form-label fw-semibold text-dark small">วิธีการชำระเงิน</label>
+        <select name="payment" class="form-select form-control-pastel">
+            <option value="qr">สแกน QR Code ชำระเงินผ่าน Mobile Banking</option>
+            <option value="transfer">โอนเงินผ่านบัญชีธนาคาร</option>
+            <option value="cod">เก็บเงินปลายทาง (COD)</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-pink-order w-100 shadow-sm">
+        <i class="fa-solid fa-check-circle me-2"></i>ยืนยันการสั่งซื้อสินค้า
+    </button>
+</form>
+    </div>
+</div>
+{% endblock %}

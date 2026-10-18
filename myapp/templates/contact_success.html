@@ -1,0 +1,75 @@
+{% extends 'basetemplate.html' %}
+{% block title %}ส่งข้อความสำเร็จ - PM Mobile Store{% endblock %}
+
+{% block content %}
+<style>
+    .navbar-custom {
+        background: rgba(255, 240, 243, 0.85) !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 182, 193, 0.4);
+        box-shadow: 0 4px 20px rgba(255, 182, 193, 0.15);
+    }
+    .card-success-pastel {
+        border: none !important;
+        border-radius: 24px !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        box-shadow: 0 10px 30px rgba(255, 182, 193, 0.25) !important;
+    }
+    .icon-success-circle {
+        width: 90px;
+        height: 90px;
+        background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+        color: #2e7d32;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin: 0 auto 20px;
+        font-size: 45px;
+        box-shadow: 0 5px 15px rgba(46, 125, 50, 0.2);
+    }
+    .btn-back-home {
+        background: linear-gradient(135deg, #ff9a9e, #fecfef);
+        color: #5a3d40;
+        font-weight: 600;
+        border: none;
+        border-radius: 50px;
+        padding: 10px 30px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .btn-back-home:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 154, 158, 0.4);
+        color: #333;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const nav = document.querySelector(".navbar");
+        if (nav) {
+            nav.classList.add("navbar-custom", "fixed-top");
+            document.body.style.paddingTop = "85px";
+        }
+    });
+</script>
+
+<div class="container my-5 d-flex justify-content-center align-items-center" style="min-height: 60vh;">
+    <div class="card p-5 card-success-pastel text-center w-100" style="max-width: 550px;">
+        <div class="icon-success-circle">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <h3 class="fw-bold text-dark mb-2">ส่งข้อความสอบถามเรียบร้อยแล้ว!</h3>
+        <p class="text-muted mb-4">ขอบคุณสำหรับคำสอบถามครับ/ค่ะ ทีมงานได้รับข้อมูลของคุณเรียบร้อยแล้ว และจะติดต่อกลับโดยเร็วที่สุด </p>
+        
+        <div>
+            <a href="/home/" class="btn-back-home shadow-sm">
+                <i class="fa-solid fa-house me-2"></i>กลับสู่หน้าหลัก
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
